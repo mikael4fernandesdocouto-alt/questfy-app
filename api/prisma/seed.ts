@@ -28,6 +28,30 @@ async function main() {
   }
   console.log(`  ✅ ${achievements.length} achievements`);
 
+  // ---- TITLES ----
+  const titles = [
+    { name: 'Novato', description: 'Complete seu primeiro dia de estudos', icon: '🌱', requiredXp: 0, requiredRank: null },
+    { name: 'Estudante', description: 'Acumule 200 XP', icon: '📖', requiredXp: 200, requiredRank: null },
+    { name: 'Dedicado', description: 'Acumule 500 XP e alcance Rank D', icon: '📚', requiredXp: 500, requiredRank: 'D' },
+    { name: 'Competente', description: 'Acumule 1.500 XP e alcance Rank C', icon: '🎯', requiredXp: 1500, requiredRank: 'C' },
+    { name: 'Especialista', description: 'Acumule 4.000 XP e alcance Rank B', icon: '💡', requiredXp: 4000, requiredRank: 'B' },
+    { name: 'Mestre', description: 'Acumule 8.000 XP e alcance Rank A', icon: '🏅', requiredXp: 8000, requiredRank: 'A' },
+    { name: 'Lenda', description: 'Acumule 15.000 XP e alcance Rank S', icon: '👑', requiredXp: 15000, requiredRank: 'S' },
+    { name: 'Imparável', description: 'Mantenha um streak de 7 dias', icon: '🔥', requiredXp: 0, requiredRank: null },
+    { name: 'Veterano', description: 'Mantenha um streak de 30 dias', icon: '⚔️', requiredXp: 0, requiredRank: null },
+    { name: 'Centurião', description: 'Responda 100 questões corretamente', icon: '💯', requiredXp: 0, requiredRank: null },
+    { name: 'Milestone', description: 'Responda 500 questões', icon: '🏆', requiredXp: 0, requiredRank: null },
+  ];
+
+  for (const t of titles) {
+    await prisma.title.upsert({
+      where: { name: t.name },
+      update: {},
+      create: t,
+    });
+  }
+  console.log(`  ✅ ${titles.length} titles`);
+
   // ---- MISSIONS ----
   const missions = [
     { title: 'Questões do Dia', description: 'Responda 10 questões hoje', type: MissionType.DAILY, xpReward: 100, targetCount: 10 },

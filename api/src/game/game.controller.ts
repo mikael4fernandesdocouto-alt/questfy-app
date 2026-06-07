@@ -25,4 +25,12 @@ export class GameController {
   async dashboard(@Request() req) {
     return this.gameService.getDashboard(req.user.id);
   }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Perfil completo do jogador' })
+  async profile(@Request() req) {
+    return this.gameService.getProfile(req.user.id);
+  }
 }

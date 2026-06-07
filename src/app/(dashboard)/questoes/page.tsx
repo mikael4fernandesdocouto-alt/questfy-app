@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { getRandomQuestion, answerQuestion } from "@/lib/api";
+import LevelUpModal from "@/components/LevelUpModal";
 
 interface Alternative {
   id: string;
@@ -33,6 +34,8 @@ export default function QuestoesPage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [subject, setSubject] = useState<string>("");
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpData, setLevelUpData] = useState<any>(null);
 
   const fetchQuestion = useCallback(async () => {
     setFetching(true);
@@ -58,6 +61,11 @@ export default function QuestoesPage() {
     try {
       const res = await answerQuestion(question.id, selected);
       setResult(res);
+
+      if (res.leveledUp) {
+        setLevelUpData({ oldLevel: res.oldLevel, newLevel: res.newLevel, rank: res.user?.rank });
+        setShowLevelUp(true);
+      }
     } catch (e: any) {
       alert(e.message);
     } finally {
@@ -76,6 +84,15 @@ export default function QuestoesPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background-secondary)]">
+      {showLevelUp && levelUpData && (
+        <LevelUpModal
+          oldLevel={levelUpData.oldLevel}
+          newLevel={levelUpData.newLevel}
+          rank={levelUpData.rank}
+          onClose={() => setShowLevelUp(false)}
+        />
+      )}
+
       <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-white">
         <div className="container flex items-center justify-between h-14">
           <Link href="/dashboard" className="text-[var(--foreground-secondary)] hover:text-[var(--foreground)] text-sm font-medium">
@@ -106,14 +123,11 @@ export default function QuestoesPage() {
 
         {!question ? (
           <div className="card p-12 text-center">
-            <p className="text-[var(--foreground-muted)] mb-4">Nenhuma questão encontrada para esta matéria.</p>
-            <button onClick={fetchQuestion} className="btn btn-primary">
-              Tentar novamente
-            </button>
+            <p className="text-[var(--foreground-muted)] mb-4">Nenhuma questão encontrada.</p>
+            <button onClick={fetchQuestion} className="btn btn-primary">Tentar novamente</button>
           </div>
         ) : (
           <>
-            {/* Question card */}
             <div className="card p-6 mb-6">
               <div className="flex items-center gap-2 mb-4">
                 <span className={`badge ${
@@ -122,18 +136,14 @@ export default function QuestoesPage() {
                 }`}>
                   {question.difficulty === "EASY" ? "Fácil" : question.difficulty === "MEDIUM" ? "Médio" : "Difícil"}
                 </span>
-                <span className="badge badge-primary">
-                  {question.subject.replace("_", " ")}
-                </span>
+                <span className="badge badge-primary">{question.subject.replace("_", " ")}</span>
                 <span className="ml-auto text-xs text-[var(--foreground-muted)]">
                   +{question.difficulty === "EASY" ? 10 : question.difficulty === "MEDIUM" ? 20 : 40} XP
                 </span>
               </div>
-
               <p className="text-base leading-relaxed">{question.statement}</p>
             </div>
 
-            {/* Alternatives */}
             <div className="space-y-3 mb-6">
               {question.alternatives.map((alt, i) => {
                 const isSelected = selected === alt.id;
@@ -147,13 +157,10 @@ export default function QuestoesPage() {
                     onClick={() => !showResult && setSelected(alt.id)}
                     disabled={showResult}
                     className={`w-full p-4 rounded-lg border text-left transition ${
-                      isCorrectAnswer
-                        ? "border-[var(--success)] bg-[var(--success-light)]"
-                        : isWrongAnswer
-                        ? "border-[var(--danger)] bg-[var(--danger-light)]"
-                        : isSelected
-                        ? "border-[var(--primary)] bg-[var(--primary-light)]"
-                        : "border-[var(--border)] bg-white hover:border-[var(--border-dark)]"
+                      isCorrectAnswer ? "border-[var(--success)] bg-[var(--success-light)]" :
+                      isWrongAnswer ? "border-[var(--danger)] bg-[var(--danger-light)]" :
+                      isSelected ? "border-[var(--primary)] bg-[var(--primary-light)]" :
+                      "border-[var(--border)] bg-white hover:border-[var(--border-dark)]"
                     }`}
                   >
                     <span className={`font-semibold mr-3 ${
@@ -171,7 +178,6 @@ export default function QuestoesPage() {
               })}
             </div>
 
-            {/* Result */}
             {result && (
               <div className={`card p-6 mb-6 animate-fade-in ${result.answer?.isCorrect ? "border-[var(--success)]" : "border-[var(--danger)]"}`}>
                 <div className="flex items-center gap-3 mb-4">
@@ -214,7 +220,18 @@ export default function QuestoesPage() {
                     <strong className="text-[var(--accent)]">Nova conquista!</strong>
                     {result.newAchievements.map((a: any) => (
                       <div key={a.id} className="text-sm mt-1 text-[var(--foreground-secondary)]">
-                        {a.name} — {a.description}
+                        {a.icon} {a.name} — {a.description}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {result.newTitles?.length > 0 && (
+                  <div className="mt-4 p-4 rounded-lg bg-[var(--primary-light)] border border-blue-200">
+                    <strong className="text-[var(--primary)]">Novo título desbloqueado!</strong>
+                    {result.newTitles.map((t: any) => (
+                      <div key={t.id} className="text-sm mt-1 text-[var(--foreground-secondary)]">
+                        {t.icon} {t.name} — {t.description}
                       </div>
                     ))}
                   </div>
@@ -222,21 +239,13 @@ export default function QuestoesPage() {
               </div>
             )}
 
-            {/* Action */}
             <div className="flex gap-4">
               {!result ? (
-                <button
-                  onClick={handleAnswer}
-                  disabled={!selected || loading}
-                  className="btn btn-primary btn-lg flex-1"
-                >
+                <button onClick={handleAnswer} disabled={!selected || loading} className="btn btn-primary btn-lg flex-1">
                   {loading ? "Verificando..." : "Responder"}
                 </button>
               ) : (
-                <button
-                  onClick={fetchQuestion}
-                  className="btn btn-primary btn-lg flex-1"
-                >
+                <button onClick={fetchQuestion} className="btn btn-primary btn-lg flex-1">
                   Próxima questão
                 </button>
               )}

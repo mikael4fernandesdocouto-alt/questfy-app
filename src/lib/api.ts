@@ -56,7 +56,7 @@ export function logout() {
 // ============ USER ============
 
 export function getProfile() {
-  return apiFetch<any>('/users/me');
+  return apiFetch<any>('/game/profile');
 }
 
 export function getStats() {

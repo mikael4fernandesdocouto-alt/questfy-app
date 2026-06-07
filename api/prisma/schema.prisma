@@ -242,3 +242,50 @@ model RankingEntry {
   @@index([season, xpTotal])
   @@map("ranking_entries")
 }
+
+// ============ TITLES ============
+
+model Title {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  icon        String
+  requiredXp  Int      @map("required_xp")
+  requiredRank Rank?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  userTitles  UserTitle[]
+
+  @@map("titles")
+}
+
+model UserTitle {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  titleId   String   @map("title_id")
+  unlockedAt DateTime @default(now()) @map("unlocked_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, titleId])
+  @@map("user_titles")
+}
+
+// ============ WEEKLY LOG (for graphs) ============
+
+model WeeklyLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  weekStart DateTime @map("week_start")
+  dayOfWeek Int      @map("day_of_week")
+  xpEarned  Int      @default(0) @map("xp_earned")
+  questionsAnswered Int @default(0) @map("questions_answered")
+  correctAnswers    Int @default(0) @map("correct_answers")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart, dayOfWeek])
+  @@index([userId, weekStart])
+  @@map("weekly_logs")
+}
