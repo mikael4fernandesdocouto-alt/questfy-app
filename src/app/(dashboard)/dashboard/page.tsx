@@ -20,8 +20,10 @@ export default function DashboardPage() {
   if (loading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl animate-float">⚔️</div>
-        <span className="ml-3 text-gray-400">Carregando...</span>
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <span className="text-[var(--foreground-muted)] text-sm">Carregando...</span>
+        </div>
       </div>
     );
   }
@@ -29,56 +31,96 @@ export default function DashboardPage() {
   const { user, stats } = data;
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      <header className="sticky top-0 z-50 border-b border-[var(--card-border)] bg-[var(--background)]/90 backdrop-blur px-6 py-3">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-[var(--background-secondary)]">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-white">
+        <div className="container flex items-center justify-between h-14">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl">⚔️</span>
-            <span className="text-lg font-bold gradient-text">Questfy</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/questoes" className="text-sm text-gray-400 hover:text-white">Questões</Link>
-            <Link href="/missoes" className="text-sm text-gray-400 hover:text-white">Missões</Link>
-            <Link href="/ranking" className="text-sm text-gray-400 hover:text-white">Ranking</Link>
-            <Link href="/simulado" className="text-sm text-gray-400 hover:text-white">Boss Battle</Link>
-            <div className="flex items-center gap-2 pl-4 border-l border-[var(--card-border)]">
-              <span className="text-sm">{getRankEmoji(user?.rank)}</span>
-              <span className="text-sm font-medium">{user?.username}</span>
-              <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--primary)]/20 text-[var(--primary-light)]">
-                Nv. {user?.level}
-              </span>
-              <button onClick={() => { logout(); router.push("/"); }} className="text-xs text-gray-500 hover:text-red-400 ml-2">
-                Sair
-              </button>
+            <div className="w-7 h-7 rounded-lg bg-[var(--primary)] flex items-center justify-center">
+              <span className="text-white font-bold text-xs">Q</span>
             </div>
+            <span className="text-lg font-bold text-[var(--foreground)]">Questfy</span>
+          </Link>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="/questoes" className="text-sm font-medium text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition">
+              Questões
+            </Link>
+            <Link href="/missoes" className="text-sm font-medium text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition">
+              Missões
+            </Link>
+            <Link href="/ranking" className="text-sm font-medium text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition">
+              Ranking
+            </Link>
+            <Link href="/simulado" className="text-sm font-medium text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition">
+              Simulados
+            </Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="badge badge-primary">Nv. {user?.level || 1}</span>
+              <span className="badge badge-success">Rank {user?.rank || "E"}</span>
+            </div>
+            <span className="text-sm font-medium hidden sm:block">{user?.username}</span>
+            <button
+              onClick={() => { logout(); router.push("/"); }}
+              className="btn btn-secondary btn-sm"
+            >
+              Sair
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="container py-8">
+        {/* Welcome */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">
-            Olá, <span className="gradient-text">{user?.username}</span> 👋
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">
+            Olá, {user?.username}
           </h1>
-          <p className="text-gray-400 mt-1">Pronto para mais uma jornada de estudos?</p>
+          <p className="text-[var(--foreground-secondary)]">
+            Acompanhe seu progresso e continue estudando.
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card icon="⭐" label="XP Atual" value={user?.xp || 0} accent="text-[var(--accent)]" />
-          <Card icon="📊" label="Nível" value={user?.level || 1} accent="text-[var(--primary-light)]" />
-          <Card icon={getRankEmoji(user?.rank)} label="Rank" value={user?.rank || "E"} accent="text-[var(--secondary)]" />
-          <Card icon="🔥" label="Streak" value={`${user?.streak || 0} dias`} accent="text-orange-400" />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatCard
+            label="XP Atual"
+            value={user?.xp || 0}
+            subtitle={`de ${user?.xpToNextLevel || 100} para próximo nível`}
+            accent="primary"
+          />
+          <StatCard
+            label="Nível"
+            value={user?.level || 1}
+            subtitle={`Total: ${(user?.totalXp || 0).toLocaleString()} XP`}
+            accent="success"
+          />
+          <StatCard
+            label="Rank"
+            value={user?.rank || "E"}
+            subtitle={getRankLabel(user?.rank)}
+            accent="warning"
+          />
+          <StatCard
+            label="Streak"
+            value={`${user?.streak || 0} dias`}
+            subtitle="Sequência de estudos"
+            accent="danger"
+          />
         </div>
 
         {/* XP Progress */}
-        <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--card-border)] mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">Progresso de Nível</span>
-            <span className="text-sm font-medium">{user?.xp || 0} / {user?.xpToNextLevel || 100} XP</span>
+        <div className="card p-6 mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">Progresso de Nível</h3>
+            <span className="text-sm text-[var(--foreground-muted)]">
+              {user?.xp || 0} / {user?.xpToNextLevel || 100} XP
+            </span>
           </div>
-          <div className="h-3 rounded-full bg-[var(--background)] overflow-hidden">
+          <div className="progress-bar">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] transition-all"
+              className="progress-bar-fill"
               style={{ width: `${Math.min(((user?.xp || 0) / (user?.xpToNextLevel || 100)) * 100, 100)}%` }}
             />
           </div>
@@ -86,26 +128,41 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <QuickAction icon="📝" title="Resolver Questões" description="Ganhe XP respondendo questões" href="/questoes" />
-          <QuickAction icon="🎯" title="Missões Diárias" description="Complete missões para bônus" href="/missoes" />
-          <QuickAction icon="👑" title="Boss Battle" description="Enfrente um simulado completo" href="/simulado" />
+          <ActionCard
+            href="/questoes"
+            title="Resolver Questões"
+            description="Ganhe XP respondendo questões do ENEM"
+            accent="primary"
+          />
+          <ActionCard
+            href="/missoes"
+            title="Missões Diárias"
+            description="Complete missões para bônus de XP"
+            accent="success"
+          />
+          <ActionCard
+            href="/simulado"
+            title="Simulados"
+            description="Enfrente simulados completos"
+            accent="warning"
+          />
         </div>
 
-        {/* Stats */}
-        <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--card-border)]">
-          <h2 className="text-lg font-bold mb-4">📈 Seu Desempenho</h2>
+        {/* Performance */}
+        <div className="card p-6">
+          <h3 className="font-semibold mb-4">Desempenho</h3>
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-4 rounded-lg bg-[var(--background)]">
-              <div className="text-2xl font-bold text-[var(--primary-light)]">{stats?.totalAnswers || 0}</div>
-              <div className="text-xs text-gray-500">Questões Respondidas</div>
+            <div className="text-center p-4 rounded-lg bg-[var(--background-secondary)]">
+              <div className="text-2xl font-bold text-[var(--primary)]">{stats?.totalAnswers || 0}</div>
+              <div className="text-xs text-[var(--foreground-muted)] mt-1">Questões Respondidas</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-[var(--background)]">
+            <div className="text-center p-4 rounded-lg bg-[var(--background-secondary)]">
               <div className="text-2xl font-bold text-[var(--success)]">{stats?.correctAnswers || 0}</div>
-              <div className="text-xs text-gray-500">Acertos</div>
+              <div className="text-xs text-[var(--foreground-muted)] mt-1">Acertos</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-[var(--background)]">
+            <div className="text-center p-4 rounded-lg bg-[var(--background-secondary)]">
               <div className="text-2xl font-bold text-[var(--accent)]">{stats?.accuracy || 0}%</div>
-              <div className="text-xs text-gray-500">Precisão</div>
+              <div className="text-xs text-[var(--foreground-muted)] mt-1">Precisão</div>
             </div>
           </div>
         </div>
@@ -114,27 +171,49 @@ export default function DashboardPage() {
   );
 }
 
-function Card({ icon, label, value, accent }: { icon: string; label: string; value: any; accent: string }) {
+function StatCard({ label, value, subtitle, accent }: { label: string; value: any; subtitle: string; accent: string }) {
+  const colors: Record<string, string> = {
+    primary: "text-[var(--primary)]",
+    success: "text-[var(--success)]",
+    warning: "text-[var(--accent)]",
+    danger: "text-[var(--danger)]",
+  };
+
   return (
-    <div className="p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)] text-center">
-      <div className="text-2xl mb-1">{icon}</div>
-      <div className={`text-2xl font-bold ${accent}`}>{value}</div>
-      <div className="text-xs text-gray-500">{label}</div>
+    <div className="card p-5">
+      <p className="text-xs font-medium text-[var(--foreground-muted)] uppercase tracking-wider mb-1">{label}</p>
+      <p className={`text-2xl font-bold ${colors[accent] || "text-[var(--foreground)]"}`}>{value}</p>
+      <p className="text-xs text-[var(--foreground-muted)] mt-1">{subtitle}</p>
     </div>
   );
 }
 
-function QuickAction({ icon, title, description, href }: { icon: string; title: string; description: string; href: string }) {
+function ActionCard({ href, title, description, accent }: { href: string; title: string; description: string; accent: string }) {
+  const colors: Record<string, string> = {
+    primary: "bg-[var(--primary-light)] text-[var(--primary)]",
+    success: "bg-[var(--success-light)] text-[var(--success)]",
+    warning: "bg-[var(--warning-light)] text-[var(--accent)]",
+  };
+
   return (
-    <Link href={href} className="p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--primary)] transition group">
-      <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{icon}</div>
-      <h3 className="font-bold mb-1">{title}</h3>
-      <p className="text-sm text-gray-400">{description}</p>
+    <Link href={href} className="card p-5 hover:border-[var(--border-dark)] transition group">
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${colors[accent]}`}>
+        <span className="text-lg">{accent === "primary" ? "📝" : accent === "success" ? "🎯" : "👑"}</span>
+      </div>
+      <h4 className="font-semibold mb-1 group-hover:text-[var(--primary)] transition">{title}</h4>
+      <p className="text-sm text-[var(--foreground-muted)]">{description}</p>
     </Link>
   );
 }
 
-function getRankEmoji(rank: string): string {
-  const map: Record<string, string> = { E: "⚪", D: "🟤", C: "🟢", B: "🔵", A: "🟣", S: "🟡" };
-  return map[rank] || "⚪";
+function getRankLabel(rank: string): string {
+  const labels: Record<string, string> = {
+    E: "Iniciante",
+    D: "Aprendiz",
+    C: "Estudante",
+    B: "Dedicado",
+    A: "Avançado",
+    S: "Mestre",
+  };
+  return labels[rank] || "Iniciante";
 }

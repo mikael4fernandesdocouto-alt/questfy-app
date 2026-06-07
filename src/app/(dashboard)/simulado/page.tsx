@@ -1,68 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function SimuladoPage() {
-  const [exams, setExams] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Fetch exams from API
-    fetch("/api/exams")
-      .then(res => res.json())
-      .then(data => setExams(data || []))
-      .catch(() => setExams(getDefaultExams()))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="text-gray-400">Carregando simulados...</span>
-      </div>
-    );
-  }
+  const exams = [
+    { title: "ENEM 2024 - Simulado Completo", questions: 180, timeLimit: 330, xpReward: 300, difficulty: "Difícil", description: "Simulado completo com todas as áreas do conhecimento." },
+    { title: "ENEM - Matemática e suas Tecnologias", questions: 45, timeLimit: 90, xpReward: 100, difficulty: "Médio", description: "Questões de matemática do ENEM." },
+    { title: "ENEM - Linguagens e Códigos", questions: 45, timeLimit: 90, xpReward: 100, difficulty: "Médio", description: "Questões de linguagens, códigos e suas tecnologias." },
+    { title: "ENEM - Ciências Humanas", questions: 45, timeLimit: 90, xpReward: 100, difficulty: "Médio", description: "Questões de história, geografia, filosofia e sociologia." },
+    { title: "ENEM - Ciências da Natureza", questions: 45, timeLimit: 90, xpReward: 100, difficulty: "Médio", description: "Questões de física, química e biologia." },
+    { title: "Simulado Rápido", questions: 10, timeLimit: 30, xpReward: 50, difficulty: "Fácil", description: "Simulado rápido para testar seus conhecimentos." },
+  ];
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      <header className="sticky top-0 z-50 border-b border-[var(--card-border)] bg-[var(--background)]/90 backdrop-blur px-6 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link href="/dashboard" className="text-gray-400 hover:text-white">← Voltar</Link>
-          <span className="text-lg font-bold">👑 Boss Battles</span>
+    <div className="min-h-screen bg-[var(--background-secondary)]">
+      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-white">
+        <div className="container flex items-center justify-between h-14">
+          <Link href="/dashboard" className="text-[var(--foreground-secondary)] hover:text-[var(--foreground)] text-sm font-medium">
+            ← Voltar
+          </Link>
+          <span className="font-semibold">Simulados</span>
           <div className="w-16" />
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold mb-2">⚔️ Escolha seu Desafio</h1>
-        <p className="text-gray-400 mb-6">Complete simulados para ganhar grandes quantidades de XP</p>
+      <main className="container py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Simulados</h1>
+          <p className="text-[var(--foreground-secondary)]">
+            Teste seus conhecimentos com simulados completos do ENEM.
+          </p>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          {(exams.length > 0 ? exams : getDefaultExams()).map((exam: any, i: number) => (
+          {exams.map((exam, i) => (
             <div
               key={i}
-              className="p-6 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--primary)] transition group"
+              className="card p-6 hover:border-[var(--border-dark)] transition"
             >
               <div className="flex items-start justify-between mb-3">
-                <span className="text-4xl group-hover:scale-110 transition-transform">{exam.icon || "👑"}</span>
-                <span className="px-2 py-1 text-xs rounded-full bg-[var(--accent)]/20 text-[var(--accent)]">
-                  +{exam.xpReward || 300} XP
-                </span>
-              </div>
-              <h3 className="font-bold text-lg mb-1">{exam.title}</h3>
-              <div className="flex gap-4 text-sm text-gray-400">
-                <span>📝 {exam.questions || 45} questões</span>
-                <span>⏱️ {exam.timeLimit || 90} min</span>
-              </div>
-              <div className="mt-3 text-xs">
-                <span className={`px-2 py-0.5 rounded ${
-                  exam.difficulty === "Hard" ? "bg-red-500/20 text-red-400" :
-                  exam.difficulty === "Médio" ? "bg-yellow-500/20 text-yellow-400" :
-                  "bg-green-500/20 text-green-400"
+                <span className={`badge ${
+                  exam.difficulty === "Difícil" ? "badge-danger" :
+                  exam.difficulty === "Médio" ? "badge-warning" : "badge-success"
                 }`}>
-                  {exam.difficulty || "Médio"}
+                  {exam.difficulty}
                 </span>
+                <span className="text-[var(--accent)] font-bold text-sm">+{exam.xpReward} XP</span>
+              </div>
+              <h3 className="font-semibold text-lg mb-1">{exam.title}</h3>
+              <p className="text-sm text-[var(--foreground-secondary)] mb-4">{exam.description}</p>
+              <div className="flex items-center gap-4 text-sm text-[var(--foreground-muted)]">
+                <span>{exam.questions} questões</span>
+                <span>•</span>
+                <span>{exam.timeLimit} min</span>
               </div>
             </div>
           ))}
@@ -70,15 +60,4 @@ export default function SimuladoPage() {
       </main>
     </div>
   );
-}
-
-function getDefaultExams() {
-  return [
-    { title: "ENEM 2024 - Completo", questions: 180, timeLimit: 330, xpReward: 300, icon: "👑", difficulty: "Hard" },
-    { title: "ENEM - Matemática", questions: 45, timeLimit: 90, xpReward: 100, icon: "📐", difficulty: "Médio" },
-    { title: "ENEM - Linguagens", questions: 45, timeLimit: 90, xpReward: 100, icon: "📚", difficulty: "Médio" },
-    { title: "ENEM - Humanas", questions: 45, timeLimit: 90, xpReward: 100, icon: "🌍", difficulty: "Médio" },
-    { title: "ENEM - Natureza", questions: 45, timeLimit: 90, xpReward: 100, icon: "🔬", difficulty: "Médio" },
-    { title: "Simulado Relâmpago", questions: 10, timeLimit: 30, xpReward: 50, icon: "⚡", difficulty: "Fácil" },
-  ];
 }

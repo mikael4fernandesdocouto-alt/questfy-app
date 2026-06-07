@@ -29,79 +29,87 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
+    <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-[var(--background-secondary)]">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold gradient-text">
-            ⚔️ Questfy
+          <Link href="/" className="inline-flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center">
+              <span className="text-white font-bold text-sm">Q</span>
+            </div>
+            <span className="text-xl font-bold text-[var(--foreground)]">Questfy</span>
           </Link>
-          <p className="text-gray-400 mt-2">Comece sua jornada épica</p>
+          <h1 className="text-2xl font-bold mb-2">Criar sua conta</h1>
+          <p className="text-[var(--foreground-secondary)]">Comece a estudar para o ENEM agora</p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="p-8 rounded-xl bg-[var(--card)] border border-[var(--card-border)] space-y-5"
-        >
+        <div className="card p-8">
           {error && (
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center">
+            <div className="p-3 rounded-lg bg-[var(--danger-light)] border border-red-200 text-[var(--danger)] text-sm mb-5">
               {error}
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-300">Nome de Guerreiro</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              minLength={3}
-              maxLength={20}
-              className="w-full px-4 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--card-border)] focus:border-[var(--primary)] outline-none transition text-white"
-              placeholder="SeuNome"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="username" className="label">Nome de usuário</label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                minLength={3}
+                maxLength={20}
+                className="input"
+                placeholder="Seu nome"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-300">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--card-border)] focus:border-[var(--primary)] outline-none transition text-white"
-              placeholder="seu@email.com"
-            />
-          </div>
+            <div>
+              <label htmlFor="email" className="label">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="input"
+                placeholder="seu@email.com"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-300">Senha</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="w-full px-4 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--card-border)] focus:border-[var(--primary)] outline-none transition text-white"
-              placeholder="Mínimo 6 caracteres"
-            />
-          </div>
+            <div>
+              <label htmlFor="password" className="label">Senha</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="input"
+                placeholder="Mínimo 6 caracteres"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg font-bold bg-[var(--primary)] hover:bg-[var(--primary-light)] transition disabled:opacity-50 text-white"
-          >
-            {loading ? "Criando..." : "⚔️ Criar Conta"}
-          </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary w-full btn-lg"
+            >
+              {loading ? "Criando conta..." : "Criar conta"}
+            </button>
+          </form>
 
-          <p className="text-center text-sm text-gray-500">
+          <div className="divider my-6" />
+
+          <p className="text-center text-sm text-[var(--foreground-secondary)]">
             Já tem conta?{" "}
-            <Link href="/login" className="text-[var(--primary-light)] hover:underline">
+            <Link href="/login" className="text-[var(--primary)] font-semibold hover:underline">
               Fazer login
             </Link>
           </p>
-        </form>
+        </div>
       </div>
     </main>
   );
