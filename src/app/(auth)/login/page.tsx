@@ -7,8 +7,8 @@ import { login } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("teste@questfy.com");
+  const [password, setPassword] = useState("123456");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -21,7 +21,11 @@ export default function LoginPage() {
       await login(email, password);
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Erro ao fazer login");
+      if (err.message.includes('API não disponível') || err.message.includes('fetch')) {
+        setError("Backend não configurado. O deploy da API ainda não foi realizado.");
+      } else {
+        setError(err.message || "Erro ao fazer login");
+      }
     } finally {
       setLoading(false);
     }
@@ -93,6 +97,10 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
+
+        <p className="text-center text-xs text-[var(--foreground-muted)] mt-6">
+          Usuário de teste: teste@questfy.com / 123456
+        </p>
       </div>
     </main>
   );

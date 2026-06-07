@@ -1,5 +1,8 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://questfy-api.onrender.com/api/v1';
 
+// Check if we should use mock data (when API is not available)
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
+
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('questfy_token');
@@ -21,12 +24,19 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: 'Erro desconhecido' }));
-    throw new Error(err.message || `HTTP ${res.status}`);
+  try {
+    const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Erro desconhecido' }));
+      throw new Error(err.message || `HTTP ${res.status}`);
+    }
+    return res.json();
+  } catch (error: any) {
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('API não disponível. Verifique sua conexão.');
+    }
+    throw error;
   }
-  return res.json();
 }
 
 // ============ AUTH ============
@@ -136,4 +146,4 @@ export function getMyRanking(season = '2026') {
   return apiFetch<any>(`/ranking/me?season=${season}`);
 }
 
-export { getToken, setToken, clearToken };
+export { getToken, setToken, clearToken, USE_MOCK };
