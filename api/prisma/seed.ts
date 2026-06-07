@@ -72,8 +72,33 @@ async function main() {
     { statement: 'Qual organela celular é responsável pela produção de energia (ATP)?', difficulty: Difficulty.MEDIUM, subject: Subject.CIENCIAS_NATUREZA, examType: ExamType.ENEM, examYear: 2022, explanation: 'A mitocôndria é responsável pela respiração celular e produção de ATP.', alternatives: [{ text: 'Ribossomo', correct: false }, { text: 'Mitocôndria', correct: true }, { text: 'Núcleo', correct: false }, { text: 'Retículo endoplasmático', correct: false }, { text: 'Complexo de Golgi', correct: false }] },
   ];
 
+  const moreQuestions = [
+    // MATEMÁTICA
+    { statement: 'Qual é o valor de √(144)?', difficulty: Difficulty.EASY, subject: Subject.MATEMATICA, examType: ExamType.ENEM, examYear: 2020, explanation: '√144 = 12, pois 12² = 144.', alternatives: [{ text: '10', correct: false }, { text: '11', correct: false }, { text: '12', correct: true }, { text: '13', correct: false }, { text: '14', correct: false }] },
+    { statement: ' Uma loja oferece um desconto de 20% sobre o preço de um produto que custa R$ 150,00. Qual é o preço com desconto?', difficulty: Difficulty.EASY, subject: Subject.MATEMATICA, examType: ExamType.ENEM, examYear: 2020, explanation: 'Desconto = 150 × 0,20 = R$ 30,00. Preço final = 150 - 30 = R$ 120,00.', alternatives: [{ text: 'R$ 100,00', correct: false }, { text: 'R$ 120,00', correct: true }, { text: 'R$ 130,00', correct: false }, { text: 'R$ 125,00', correct: false }, { text: 'R$ 110,00', correct: false }] },
+    { statement: 'Se 3x + 5 = 20, qual é o valor de x?', difficulty: Difficulty.EASY, subject: Subject.MATEMATICA, examType: ExamType.ENEM, examYear: 2021, explanation: '3x + 5 = 20 → 3x = 15 → x = 5.', alternatives: [{ text: '3', correct: false }, { text: '5', correct: true }, { text: '7', correct: false }, { text: '15', correct: false }, { text: '4', correct: false }] },
+    { statement: 'O gráfico de uma função afim f(x) = ax + b passa pelos pontos (0, 3) e (2, 7). Qual é o valor de a?', difficulty: Difficulty.MEDIUM, subject: Subject.MATEMATICA, examType: ExamType.ENEM, examYear: 2020, explanation: 'f(0) = b = 3. f(2) = 2a + 3 = 7 → 2a = 4 → a = 2.', alternatives: [{ text: '1', correct: false }, { text: '2', correct: true }, { text: '3', correct: false }, { text: '4', correct: false }, { text: '5', correct: false }] },
+    { statement: 'Em uma PA de razão 3, o primeiro termo é 5. Qual é o 10º termo?', difficulty: Difficulty.MEDIUM, subject: Subject.MATEMATICA, examType: ExamType.ENEM, examYear: 2022, explanation: 'a_n = a_1 + (n-1)r → a_10 = 5 + 9×3 = 5 + 27 = 32.', alternatives: [{ text: '29', correct: false }, { text: '32', correct: true }, { text: '35', correct: false }, { text: '38', correct: false }, { text: '41', correct: false }] },
+
+    // LINGUAGENS
+    { statement: 'A palavra "inconstitucional" contém um prefixo. Qual é ele?', difficulty: Difficulty.EASY, subject: Subject.LINGUAGENS, examType: ExamType.ENEM, examYear: 2020, explanation: 'O prefixo é "in-" (negação), pois significa o oposto de constitucional.', alternatives: [{ text: 'in-', correct: true }, { text: 'con-', correct: false }, { text: 'tion-', correct: false }, { text: 'al-', correct: false }, { text: 'stic-', correct: false }] },
+    { statement: 'Qual é a figura de linguagem na frase "O vento sussurrava nas árvores"?', difficulty: Difficulty.MEDIUM, subject: Subject.LINGUAGENS, examType: ExamType.ENEM, examYear: 2022, explanation: 'É uma personificação (prosopopeia), pois o vento (ser inanimado) "sussurra" (ação humana).', alternatives: [{ text: 'Metáfora', correct: false }, { text: 'Personificação', correct: true }, { text: 'Hipérbole', correct: false }, { text: 'Antítese', correct: false }, { text: 'Eufemismo', correct: false }] },
+    { statement: 'Em "Ela cantava lindo", o adjetivo "lindo" exerce a função de:', difficulty: Difficulty.MEDIUM, subject: Subject.LINGUAGENS, examType: ExamType.ENEM, examYear: 2021, explanation: '"Lindo" é um predicativo do sujeito, pois caracteriza o sujeito "ela" através do verbo de ligação/cantava.', alternatives: [{ text: 'Adjunto adnominal', correct: false }, { text: 'Predicativo do sujeito', correct: true }, { text: 'Complemento nominal', correct: false }, { text: 'Adjunto adverbial', correct: false }, { text: 'Objeto direto', correct: false }] },
+
+    // CIÊNCIAS HUMANAS
+    { statement: 'A Revolução Francesa ocorreu em qual ano?', difficulty: Difficulty.EASY, subject: Subject.CIENCIAS_HUMANAS, examType: ExamType.ENEM, examYear: 2020, explanation: 'A Revolução Francesa teve início em 1789.', alternatives: [{ text: '1776', correct: false }, { text: '1789', correct: true }, { text: '1804', correct: false }, { text: '1815', correct: false }, { text: '1848', correct: false }] },
+    { statement: 'Quem foi o primeiro presidente do Brasil?', difficulty: Difficulty.MEDIUM, subject: Subject.CIENCIAS_HUMANAS, examType: ExamType.ENEM, examYear: 2021, explanation: 'Deodoro da Fonseca foi o primeiro presidente do Brasil (1889-1891).', alternatives: [{ text: 'Getúlio Vargas', correct: false }, { text: 'Deodoro da Fonseca', correct: true }, { text: 'Dom Pedro II', correct: false }, { text: 'Prudente de Morais', correct: false }, { text: 'Floriano Peixoto', correct: false }] },
+    { statement: 'O Tratado de Tordesilhas (1494) dividiu terras entre:', difficulty: Difficulty.MEDIUM, subject: Subject.CIENCIAS_HUMANAS, examType: ExamType.ENEM, examYear: 2020, explanation: 'O tratado dividiu as terras descobertas entre Portugal e Espanha.', alternatives: [{ text: 'Portugal e França', correct: false }, { text: 'Portugal e Espanha', correct: true }, { text: 'Espanha e Inglaterra', correct: false }, { text: 'Portugal e Holanda', correct: false }, { text: 'Espanha e França', correct: false }] },
+    { statement: 'A abolição da escravatura no Brasil ocorreu em:', difficulty: Difficulty.EASY, subject: Subject.CIENCIAS_HUMANAS, examType: ExamType.ENEM, examYear: 2022, explanation: 'A Lei Áurea, que aboliu a escravatura, foi assinada em 13 de maio de 1888.', alternatives: [{ text: '1822', correct: false }, { text: '1888', correct: true }, { text: '1889', correct: false }, { text: '1871', correct: false }, { text: '1900', correct: false }] },
+
+    // CIÊNCIAS DA NATUREZA
+    { statement: 'Qual é a velocidade da luz no vácuo (aproximada)?', difficulty: Difficulty.EASY, subject: Subject.CIENCIAS_NATUREZA, examType: ExamType.ENEM, examYear: 2021, explanation: 'A velocidade da luz no vácuo é aproximadamente 3 × 10⁸ m/s.', alternatives: [{ text: '3 × 10⁶ m/s', correct: false }, { text: '3 × 10⁸ m/s', correct: true }, { text: '3 × 10¹⁰ m/s', correct: false }, { text: '3 × 10⁴ m/s', correct: false }, { text: '3 × 10² m/s', correct: false }] },
+    { statement: 'Qual é o pH da água pura a 25°C?', difficulty: Difficulty.EASY, subject: Subject.CIENCIAS_NATUREZA, examType: ExamType.ENEM, examYear: 2020, explanation: 'A água pura é neutra, com pH = 7 a 25°C.', alternatives: [{ text: '0', correct: false }, { text: '5', correct: false }, { text: '7', correct: true }, { text: '10', correct: false }, { text: '14', correct: false }] },
+    { statement: 'Na fotossíntese, as plantas convertem gás carbônico e água em:', difficulty: Difficulty.MEDIUM, subject: Subject.CIENCIAS_NATUREZA, examType: ExamType.ENEM, examYear: 2021, explanation: '6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂. Produz glicose e oxigênio.', alternatives: [{ text: 'Glicose e oxigênio', correct: true }, { text: 'Proteína e gás carbônico', correct: false }, { text: 'Lipídio e água', correct: false }, { text: 'Amido e nitrogênio', correct: false }, { text: 'Álcool e hidrogênio', correct: false }] },
+  ];
+
   let qCount = 0;
-  for (const q of questions) {
+  for (const q of [...questions, ...moreQuestions]) {
     const existing = await prisma.question.findFirst({ where: { statement: q.statement } });
     if (!existing) {
       await prisma.question.create({
@@ -113,5 +138,5 @@ async function main() {
 }
 
 main()
-  catch((e) => { console.error(e); process.exit(1); })
+  .catch((e) => { console.error(e); process.exit(1); })
   .finally(() => prisma.$disconnect());

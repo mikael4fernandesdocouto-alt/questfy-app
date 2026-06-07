@@ -104,7 +104,7 @@ export function getDashboard() {
 
 // ============ MISSIONS ============
 
-export function getMissions() {
+export function getActiveMissions() {
   return apiFetch<any>('/missions');
 }
 
