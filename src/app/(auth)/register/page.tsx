@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { register } from "@/lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,22 +19,10 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Erro ao criar conta");
-      }
-
-      const { token } = await res.json();
-      localStorage.setItem("questfy_token", token);
+      await register(username, email, password);
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Erro ao criar conta");
     } finally {
       setLoading(false);
     }
