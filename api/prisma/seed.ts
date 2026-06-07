@@ -158,7 +158,21 @@ async function main() {
   }
   console.log(`  ✅ ${exams.length} exams`);
 
-  console.log('\n🎉 Seed completed successfully!');
+  // ---- TEST USER ----
+  const bcrypt = await import('bcrypt');
+  const testPassword = await bcrypt.hash('123456', 12);
+  await prisma.user.upsert({
+    where: { email: 'teste@questfy.com' },
+    update: {},
+    create: {
+      email: 'teste@questfy.com',
+      username: 'TesteQuestfy',
+      passwordHash: testPassword,
+    },
+  });
+  console.log('  ✅ Test user: teste@questfy.com / 123456');
+
+  console.log('\\n🎉 Seed completed successfully!');
 }
 
 main()

@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: questfy-api
+    env: docker
+    plan: free
+    repo: https://github.com/mikael4fernandesdocouto-alt/questfy-app
+    branch: main
+    rootDir: api
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: questfy-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: PORT
+        value: 3001
+      - key: CORS_ORIGIN
+        value: "https://mikael4fernandesdocouto-alt.github.io"
+
+databases:
+  - name: questfy-db
+    plan: free
+    databaseName: questfy
+    user: questfy
