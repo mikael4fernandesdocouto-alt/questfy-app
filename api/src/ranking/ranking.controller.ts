@@ -1,4 +1,5 @@
 import { Controller, Get, Query, UseGuards, Request } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { RankingService } from './ranking.service';
 
@@ -17,7 +18,7 @@ export class RankingController {
   }
 
   @Get('me')
-  @UseGuards()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Minha posição no ranking' })
   async myPosition(@Request() req, @Query('season') season: string) {

@@ -15,8 +15,8 @@ import { LocalStrategy } from './strategies/local.strategy';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('app.jwtSecret'),
-        signOptions: { expiresIn: config.get<string>('app.jwtExpiresIn') || '7d' },
+        secret: config.get<string>('jwtSecret') || config.get<string>('app.jwtSecret') || 'questfy-dev-secret',
+        signOptions: { expiresIn: config.get<string>('jwtExpiresIn') || config.get<string>('app.jwtExpiresIn') || '7d' },
       }),
     }),
   ],

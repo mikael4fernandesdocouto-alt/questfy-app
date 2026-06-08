@@ -8,7 +8,7 @@ export class UsersService {
   async findById(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
-      select: ['id', 'email', 'username', 'avatarUrl', 'rank', 'level', 'xp', 'totalXp', 'xpToNextLevel', 'streak', 'plan', 'createdAt'],
+      select: { id: true, email: true, username: true, avatarUrl: true, rank: true, level: true, xp: true, totalXp: true, xpToNextLevel: true, streak: true, plan: true, createdAt: true },
     });
   }
 

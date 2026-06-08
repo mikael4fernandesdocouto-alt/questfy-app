@@ -25,7 +25,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.password, 12);
     const user = await this.prisma.user.create({
       data: { email: dto.email, username: dto.username, passwordHash },
-      select: ['id', 'email', 'username', 'xp', 'level', 'rank', 'streak', 'plan', 'createdAt'],
+      select: { id: true, email: true, username: true, xp: true, level: true, rank: true, streak: true, plan: true, createdAt: true },
     });
 
     const token = this.generateToken(user.id, user.email);
@@ -53,7 +53,7 @@ export class AuthService {
   async validateUserById(userId: string) {
     return this.prisma.user.findUnique({
       where: { id: userId },
-      select: ['id', 'email', 'username', 'xp', 'level', 'rank', 'streak', 'plan'],
+      select: { id: true, email: true, username: true, xp: true, level: true, rank: true, streak: true, plan: true },
     });
   }
 

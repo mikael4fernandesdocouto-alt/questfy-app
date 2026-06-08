@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 
 @Injectable()
@@ -28,6 +28,7 @@ export class MissionsService {
     if (!um) throw new Error('Missão não atribuída');
 
     const mission = await this.prisma.mission.findUnique({ where: { id: missionId } });
+    if (!mission) throw new NotFoundException('Missão não encontrada');
     const completed = progress >= mission.targetCount;
 
     return this.prisma.userMission.update({

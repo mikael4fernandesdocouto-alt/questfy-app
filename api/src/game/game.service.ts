@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 
-const XP_REWARDS = { EASY: 10, MEDIUM: 20, HARD: 40 };
-const RANK_THRESHOLDS = [
+const XP_REWARDS: Record<string, number> = { EASY: 10, MEDIUM: 20, HARD: 40 };
+const RANK_THRESHOLDS: Array<{ rank: string; minXp: number }> = [
   { rank: 'E', minXp: 0 },
   { rank: 'D', minXp: 500 },
   { rank: 'C', minXp: 1500 },
@@ -11,17 +11,22 @@ const RANK_THRESHOLDS = [
   { rank: 'S', minXp: 15000 },
 ];
 
+function getXpForLevel(level: number): number {
+  return Math.floor(100 * Math.pow(1.15, level - 1));
+}
+
 @Injectable()
 export class GameService {
   constructor(private readonly prisma: PrismaService) {}
 
   async processAnswer(userId: string, questionId: string, selectedAltId: string) {
     const alternative = await this.prisma.alternative.findUnique({ where: { id: selectedAltId } });
-    if (!alternative) throw new Error('Alternativa não encontrada');
+    if (!alternative) throw new NotFoundException('Alternativa não encontrada');
 
     const isCorrect = alternative.isCorrect;
     const question = await this.prisma.question.findUnique({ where: { id: questionId } });
-    const xpEarned = isCorrect ? XP_REWARDS[question.difficulty] : 0;
+    if (!question) throw new NotFoundException('Questão não encontrada');
+    const xpEarned = isCorrect ? (XP_REWARDS[question.difficulty] ?? 10) : 0;
 
     const answer = await this.prisma.answer.create({
       data: { userId, questionId, selectedAltId, isCorrect, xpEarned },
@@ -59,6 +64,7 @@ export class GameService {
 
   private async updateUserXp(userId: string, xpEarned: number) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('Usuário não encontrado');
     let newXp = user.xp + xpEarned;
     let newTotalXp = user.totalXp + xpEarned;
     let newLevel = user.level;
@@ -67,14 +73,20 @@ export class GameService {
     while (newXp >= xpToNext) {
       newXp -= xpToNext;
       newLevel++;
-      xpToNext = Math.floor(100 * Math.pow(1.15, newLevel - 1));
+      xpToNext = getXpForLevel(newLevel);
     }
 
     const newRank = this.determineRank(newTotalXp);
 
     return this.prisma.user.update({
       where: { id: userId },
-      data: { xp: newXp, totalXp: newTotalXp, level: newLevel, xpToNextLevel: xpToNext, rank: newRank },
+      data: {
+        xp: newXp,
+        totalXp: newTotalXp,
+        level: newLevel,
+        xpToNextLevel: xpToNext,
+        rank: newRank as any,
+      },
     });
   }
 
@@ -88,6 +100,7 @@ export class GameService {
 
   private async updateStreak(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return;
     const today = new Date(); today.setHours(0, 0, 0, 0);
 
     if (user.lastStudyDate) {
@@ -122,10 +135,10 @@ export class GameService {
     });
   }
 
-  private async checkAchievements(userId: string) {
+  private async checkAchievements(userId: string): Promise<any[]> {
     const achievements = await this.prisma.achievement.findMany();
     const unlocked = (await this.prisma.userAchievement.findMany({ where: { userId }, select: { achievementId: true } })).map(u => u.achievementId);
-    const newlyUnlocked = [];
+    const newlyUnlocked: any[] = [];
 
     for (const a of achievements) {
       if (unlocked.includes(a.id)) continue;
@@ -137,10 +150,10 @@ export class GameService {
     return newlyUnlocked;
   }
 
-  private async checkTitles(user: any) {
+  private async checkTitles(user: any): Promise<any[]> {
     const titles = await this.prisma.title.findMany();
     const unlocked = (await this.prisma.userTitle.findMany({ where: { userId: user.id }, select: { titleId: true } })).map(u => u.titleId);
-    const newlyUnlocked = [];
+    const newlyUnlocked: any[] = [];
 
     for (const t of titles) {
       if (unlocked.includes(t.id)) continue;
@@ -161,9 +174,9 @@ export class GameService {
     switch (cond.type) {
       case 'questions_answered': return (await this.prisma.answer.count({ where: { userId } })) >= cond.count;
       case 'correct_answers': return (await this.prisma.answer.count({ where: { userId, isCorrect: true } })) >= cond.count;
-      case 'streak': { const u = await this.prisma.user.findUnique({ where: { id: userId } }); return u.streak >= cond.days; }
-      case 'level': { const u = await this.prisma.user.findUnique({ where: { id: userId } }); return u.level >= cond.level; }
-      case 'rank': { const u = await this.prisma.user.findUnique({ where: { id: userId } }); return u.rank === cond.rank; }
+      case 'streak': { const u = await this.prisma.user.findUnique({ where: { id: userId } }); return (u?.streak ?? 0) >= cond.days; }
+      case 'level': { const u = await this.prisma.user.findUnique({ where: { id: userId } }); return (u?.level ?? 1) >= cond.level; }
+      case 'rank': { const u = await this.prisma.user.findUnique({ where: { id: userId } }); return u?.rank === cond.rank; }
       default: return false;
     }
   }
@@ -175,6 +188,8 @@ export class GameService {
         userTitles: { include: { title: true }, orderBy: { unlockedAt: 'desc' }, take: 3 },
       },
     });
+
+    if (!user) throw new NotFoundException('Usuário não encontrado');
 
     const [totalAnswers, correctAnswers, recentAchievements, activeMissions, weeklyLog] = await Promise.all([
       this.prisma.answer.count({ where: { userId } }),
@@ -226,7 +241,7 @@ export class GameService {
     });
 
     // Fill in missing days with zeros
-    const result = [];
+    const result: Array<{ day: string; xp: number; questions: number; correct: number }> = [];
     for (let i = 0; i < 7; i++) {
       const log = logs.find(l => l.dayOfWeek === i);
       const dayNames = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
@@ -248,6 +263,8 @@ export class GameService {
         achievements: { include: { achievement: true }, orderBy: { unlockedAt: 'desc' } },
       },
     });
+
+    if (!user) throw new NotFoundException('Usuário não encontrado');
 
     const [totalAnswers, correctAnswers] = await Promise.all([
       this.prisma.answer.count({ where: { userId } }),

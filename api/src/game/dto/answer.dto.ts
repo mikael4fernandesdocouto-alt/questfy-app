@@ -4,9 +4,9 @@ import { ApiProperty } from '@nestjs/swagger';
 export class AnswerDto {
   @ApiProperty({ example: 'clx...' })
   @IsString()
-  questionId: string;
+  questionId: string = '';
 
   @ApiProperty({ example: 'clx...' })
   @IsString()
-  selectedAltId: string;
+  selectedAltId: string = '';
 }

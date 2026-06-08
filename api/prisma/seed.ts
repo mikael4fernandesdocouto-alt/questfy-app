@@ -47,7 +47,7 @@ async function main() {
     await prisma.title.upsert({
       where: { name: t.name },
       update: {},
-      create: t,
+      create: t as any,
     });
   }
   console.log(`  ✅ ${titles.length} titles`);
@@ -64,7 +64,7 @@ async function main() {
 
   for (const m of missions) {
     const existing = await prisma.mission.findFirst({ where: { title: m.title } });
-    if (!existing) await prisma.mission.create({ data: m });
+    if (!existing) await prisma.mission.create({ data: m as any });
   }
   console.log(`  ✅ ${missions.length} missions`);
 
@@ -154,7 +154,7 @@ async function main() {
 
   for (const e of exams) {
     const existing = await prisma.exam.findFirst({ where: { title: e.title } });
-    if (!existing) await prisma.exam.create({ data: e });
+    if (!existing) await prisma.exam.create({ data: e as any });
   }
   console.log(`  ✅ ${exams.length} exams`);
 
